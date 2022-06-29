@@ -1,0 +1,10 @@
+.env
+__pycache__
+chromedriver.exe
+*.mp4
+*.png
+temp
+config.py
+music
+backgrounds
+chrome_data
