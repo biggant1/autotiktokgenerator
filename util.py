@@ -15,9 +15,7 @@ from config import HASH_TAGS_BASE, PREFIX_LIST
 def random_prefix() -> str:
     return choice(PREFIX_LIST)
 
-def gen_hashtags(topic: str) -> str:
-    no_space = topic.replace(" ", "")
+def gen_hashtags() -> str:
     hashtags = HASH_TAGS_BASE.copy()
-    hashtags.append(f"#{no_space}")
     shuffle(hashtags)
     return " ".join(hashtags)

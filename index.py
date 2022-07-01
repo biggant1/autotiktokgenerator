@@ -11,20 +11,21 @@ from os import path
 
 load_dotenv()
 
-def main():
-    sm = SeleniumManager()
-    twit = TwitterManager()
+class Main:
+    def __init__(self):
+        self.twit = TwitterManager(self.create_video)
 
-    topic = choice(VIDEO_TOPIC)
-    url, text = twit.get_tweet_data(topic)
-    try:
-        img = sm.screenshot_element(url, SeleniumManager.SELECTOR)
-    except TimeoutException:
-        return print("Failed to find selector")
-
-    video = VideoManager.generate_video(img)
-    tm = TiktokManager()
-    tm.upload_video(f"{random_prefix()} {topic.capitalize()}! {gen_hashtags(topic)}", path.abspath(video))
-
+    def create_video(self, status):
+        sm = SeleniumManager()
+        try:
+            img = sm.screenshot_element(TwitterManager.get_url_from_tweet(status), SeleniumManager.SELECTOR)
+        except TimeoutException:
+            return print("Failed to find selector")
+        sm.destroy()
+        video = VideoManager.generate_video(img)
+        tm = TiktokManager()
+        tm.upload_video(f"{gen_hashtags()}", path.abspath(video))
+        tm.destroy()
+    
 if __name__ == "__main__":
-    main()
+    main = Main()

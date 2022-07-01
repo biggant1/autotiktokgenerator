@@ -1,20 +1,24 @@
 from random import choice
-from twitter import Twitter, OAuth
+from numpy import result_type
+import tweepy
 import os
 
+from TwitterStream import TwitterStream
+from config import ACCOUNT_IDS
+
 class TwitterManager:
-    def __init__(self):
-        self.client = Twitter(
-            auth=OAuth(os.getenv("TWITTER_ACCESS_TOKEN"), os.getenv("TWITTER_ACCESS_TOKEN_SECRET"), os.getenv("TWITTER_API_KEY"), os.getenv("TWITTER_API_KEY_SECRET")))
+    def __init__(self, video_callback):
+        access_token = os.getenv("TWITTER_ACCESS_TOKEN")
+        access_token_secret = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+        consumer_key = os.getenv("TWITTER_API_KEY")
+        consumer_secret = os.getenv("TWITTER_API_KEY_SECRET")
 
-    def __find_longest_tweet(self, tweets):
-        return max(tweets, key=lambda tweet: len(tweet['full_text']))
+        auth = tweepy.auth.OAuthHandler(consumer_key, consumer_secret)
+        auth.set_access_token(access_token, access_token_secret)
+        self.api = tweepy.API(auth)
+        self.stream = TwitterStream(video_callback, consumer_key, consumer_secret, access_token, access_token_secret)
+        self.stream.filter(follow=ACCOUNT_IDS)
 
-    def __find_random_tweet(self, tweets):
-        return choice(tweets)
-
-    def get_tweet_data(self, keyword: str) -> tuple[str, str]:
-        query = f'"{keyword}" exclude:replies'
-        result = self.client.search.tweets(q=query, result_type="popular", count=50, tweet_mode="extended", lang="en")
-        tweet = self.__find_random_tweet(result['statuses'])
-        return (f"https://twitter.com/{tweet['user']['screen_name']}/status/{tweet['id_str']}", tweet['full_text'])
+    @staticmethod
+    def get_url_from_tweet(tweet):
+        return f"https://twitter.com/{tweet.user.screen_name}/status/{tweet.id_str}"

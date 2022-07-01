@@ -48,4 +48,7 @@ class SeleniumManager:
         img = elem.screenshot_as_png
         pil_img = Image.open(BytesIO(img))
         return pil_img
+    
+    def destroy(self):
+        self.driver.quit()
 
